@@ -1,5 +1,35 @@
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
+---
+
+# 📚 Learning Guides & Viva Preparation
+
+Aapki learning aur viva ki behtareen tayari ke liye niche detailed guides banayi gayi hain. Inhe click kar ke read karein:
+
+1. **[📱 React Native Setup & Commands Guide](file:///e:/MyProjects/ReactNative-Ai/tasskflowRN/docs/01_react_native_setup.md)**
+   - Dependencies download links (Node, JDK, Android Studio) aur environment variable configuration.
+   - Run Android, Start Metro bundler, Doctor, Audit, aur Clean cache commands ka table.
+
+2. **[📘 TypeScript Syntax & Type Definitions Guide](file:///e:/MyProjects/ReactNative-Ai/tasskflowRN/docs/02_typescript_syntax.md)**
+   - Basic TS syntax, Interface vs Type, generic `ApiResponse<T>`, custom component types, aur React Navigation stack param lists.
+
+3. **[🧭 Project Architecture & Data Flow Guide](file:///e:/MyProjects/ReactNative-Ai/tasskflowRN/docs/03_project_flow.md)**
+   - Folder structure walkthrough, screen navigation paths, data load flow (AsyncStorage -> mock API), aur Flask API/AI fallback mechanics.
+
+4. **[🔌 Mobile Testing & Debugging Guide](file:///e:/MyProjects/ReactNative-Ai/tasskflowRN/docs/04_android_mobile_testing.md)**
+   - USB cable debugging configuration on physical Android phone.
+   - Virtual Emulator installation, **scrcpy** setup guide for mirroring screen on PC, and Troubleshooting build errors.
+
+5. **[⚖️ React Web vs React Native Differences](file:///e:/MyProjects/ReactNative-Ai/tasskflowRN/docs/05_react_vs_react_native.md)**
+   - HTML tags mapping to Native components (e.g. `div` -> `View`, `p` -> `Text`).
+   - Styling differences (`StyleSheet` properties camelCase, no unit values) and Flexbox layout defaults.
+
+6. **[🎓 Viva & Technical Interview Prep](file:///e:/MyProjects/ReactNative-Ai/tasskflowRN/docs/06_viva_preparation.md)**
+   - Frequently asked questions (FAQs) with detailed Roman Urdu and English answers.
+   - In-depth logic explanations of React Context API, Custom Hooks, TanStack Query, and IP port configurations (10.0.2.2 vs localhost).
+
+---
+
 # Getting Started
 
 > **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
