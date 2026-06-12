@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 20,
-    paddingBottom: 110,
+    paddingBottom: 135,
   },
   taskCard: {
     flexDirection: 'row',
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
   },
   addTaskCard: {
     position: 'absolute',
-    bottom: 30,
+    bottom: 50,
     left: 20,
     right: 20,
     borderRadius: 20,
