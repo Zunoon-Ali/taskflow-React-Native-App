@@ -20,7 +20,7 @@ export const getGeminiTaskDescription = async (title: string): Promise<string> =
     const responseText = result.response.text();
     return responseText ? responseText.trim() : 'Focus on organizing this task into smaller steps and allocate dedicated study time.';
   } catch (error) {
-    console.error('Gemini API Task Description generation failed:', error);
+    console.warn('Gemini API Task Description generation failed (using fallback):', error);
     return 'Focus on organizing this task into smaller steps and allocate dedicated study time.';
   }
 };
@@ -57,7 +57,7 @@ export const getGeminiCoachingAdvice = async (feeling: string): Promise<{ mood: 
     
     return getFallbackCoaching(feeling);
   } catch (error) {
-    console.error('Gemini API Coaching Advice generation failed:', error);
+    console.warn('Gemini API Coaching Advice generation failed (using fallback):', error);
     return getFallbackCoaching(feeling);
   }
 };
