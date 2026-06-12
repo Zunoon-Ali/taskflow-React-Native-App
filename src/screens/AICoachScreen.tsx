@@ -1,9 +1,3 @@
-// =============================================================================
-// FILE: src/screens/AICoachScreen.tsx
-// -----------------------------------------------------------------------------
-// AI Coach screen jahan student apne problems share karke motivation aur solutions leta hai.
-// =============================================================================
-
 import React, { useState } from 'react';
 import {
   StyleSheet,
@@ -16,33 +10,30 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
-import { StackScreenProps } from '@react-navigation/stack'; // Stack navigator parameters
-import { useAppTheme } from '../context/ThemeContext'; // Light/dark theme states hook
-import { useAiMotivation } from '../hooks/useAi'; // Flask AI motivation custom hook
-import { RootStackParamList } from '../types'; // Types configurations
-import { Typography } from '../styles'; // Fonts style sheet
+import { StackScreenProps } from '@react-navigation/stack';
+import { useAppTheme } from '../context/ThemeContext';
+import { useAiMotivation } from '../hooks/useAi';
+import { RootStackParamList } from '../types';
+import { Typography } from '../styles';
 
-// Navigation props types setup
 type Props = StackScreenProps<RootStackParamList, 'AICoach'>;
 
 export const AICoachScreen: React.FC<Props> = ({ navigation }) => {
-  const { theme, toggleTheme, colors } = useAppTheme(); // Get current active theme colors
-  const { mutate: getMotivation, isPending: isLoading } = useAiMotivation(); // AI coaching query hook
+  const { theme, toggleTheme, colors } = useAppTheme();
+  const { mutate: getMotivation, isPending: isLoading } = useAiMotivation();
 
-  // Input states
   const [feelingText, setFeelingText] = useState('');
   const [mood, setMood] = useState('');
   const [advice, setAdvice] = useState('');
 
-  const isDark = theme === 'dark'; // Check dark mode active
+  const isDark = theme === 'dark';
 
-  // Get AI coaching motivation handler
   const handleGetMotivation = () => {
     if (!feelingText.trim()) return;
     getMotivation(feelingText, {
       onSuccess: (data) => {
-        setMood(data.mood); // Emotion analysis output
-        setAdvice(data.advice); // Recommendation text
+        setMood(data.mood);
+        setAdvice(data.advice);
       },
     });
   };
@@ -50,9 +41,8 @@ export const AICoachScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       
-      {/* HEADER SECTION */}
+      {/* Header */}
       <View style={[styles.headerRow, { paddingTop: Platform.OS === 'ios' ? 50 : 20 }]}>
-        {/* Back navigation button */}
         <TouchableOpacity
           style={styles.backBtn}
           activeOpacity={0.7}
@@ -61,9 +51,8 @@ export const AICoachScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={[styles.backText, { color: colors.text }]}>←</Text>
         </TouchableOpacity>
 
-        <Text style={[styles.headerTitle, { color: colors.text }]}>🤖 AI Coach</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>AI Coach</Text>
 
-        {/* Theme toggler switch */}
         <Switch
           value={isDark}
           onValueChange={toggleTheme}
@@ -74,16 +63,15 @@ export const AICoachScreen: React.FC<Props> = ({ navigation }) => {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         
-        {/* Chat / interaction avatar bubble info */}
+        {/* Coach Avatar Section */}
         <View style={styles.coachAvatarSection}>
-          <Text style={styles.coachAvatarEmoji}>🤖</Text>
           <Text style={[styles.coachAvatarTitle, { color: colors.text }]}>AI Coach</Text>
           <Text style={[styles.coachAvatarSubtitle, { color: colors.textMuted }]}>
             Tell me how you are feeling or what challenge you face today
           </Text>
         </View>
 
-        {/* FEELINGS TEXT INPUT FIELD */}
+        {/* Input */}
         <TextInput
           style={[styles.input, { 
             backgroundColor: colors.surface, 
@@ -97,7 +85,7 @@ export const AICoachScreen: React.FC<Props> = ({ navigation }) => {
           onChangeText={setFeelingText}
         />
 
-        {/* TRIGGER COACH ADVICE ACTION BUTTON */}
+        {/* Submit */}
         <TouchableOpacity
           style={styles.motivateBtn}
           activeOpacity={0.8}
@@ -107,11 +95,11 @@ export const AICoachScreen: React.FC<Props> = ({ navigation }) => {
           {isLoading ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
-            <Text style={styles.motivateBtnText}>🤖 GET AI MOTIVATION</Text>
+            <Text style={styles.motivateBtnText}>GET AI MOTIVATION</Text>
           )}
         </TouchableOpacity>
 
-        {/* DYNAMIC RESPONSE DISPLAY PANEL */}
+        {/* Response */}
         {advice ? (
           <View style={styles.responseCard}>
             <Text style={styles.moodLabel}>Mood: <Text style={styles.moodValue}>{mood}</Text></Text>
@@ -122,13 +110,11 @@ export const AICoachScreen: React.FC<Props> = ({ navigation }) => {
 
       </ScrollView>
 
-      {/* FOOTER BRANDING */}
       <Text style={[styles.footerText, { color: colors.textMuted }]}>Manage your tasks smarter</Text>
     </View>
   );
 };
 
-// Styles configuration sheet
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -161,10 +147,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
     marginTop: 10,
-  },
-  coachAvatarEmoji: {
-    fontSize: 48,
-    marginBottom: 6,
   },
   coachAvatarTitle: {
     ...Typography.h2,

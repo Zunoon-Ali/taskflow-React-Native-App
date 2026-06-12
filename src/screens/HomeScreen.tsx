@@ -1,9 +1,3 @@
-// =============================================================================
-// FILE: src/screens/HomeScreen.tsx
-// -----------------------------------------------------------------------------
-// Main Home page jahan saare tasks list hote hain aur CRUD perform hota hai.
-// =============================================================================
-
 import React, { useState } from 'react';
 import {
   StyleSheet,
@@ -17,41 +11,50 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { StackScreenProps } from '@react-navigation/stack'; // Navigation types
-import { useAppTheme } from '../context/ThemeContext'; // Theme context
-import { useTasks } from '../hooks/useTasks'; // Tasks global state context hook
-import useFlaskStatus from '../hooks/useFlaskApi'; // Flask connection status hook
-import { RootStackParamList, Task } from '../types'; // TypeScript interfaces
-import { Colors, Typography } from '../styles'; // Visual styling configurations
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StackScreenProps } from '@react-navigation/stack';
+import { useAppTheme } from '../context/ThemeContext';
+import { useTasks } from '../hooks/useTasks';
+import useFlaskStatus from '../hooks/useFlaskApi';
+import { RootStackParamList, Task } from '../types';
+import { Typography } from '../styles';
 
-// Screen props typings setup
 type Props = StackScreenProps<RootStackParamList, 'Home'>;
 
 export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
-  const username = route.params?.username || 'waqar'; // Login se pass kiya hua username
-  const { theme, toggleTheme, colors } = useAppTheme(); // Theme colors list
-  const { tasks, loading, addTask, deleteTask, toggleTaskCompleted } = useTasks(); // Tasks actions
-  const { data: flaskData, refetch: refetchFlask, isFetching: isFlaskLoading } = useFlaskStatus(); // Flask live status hook
+  // Extract clean username from email or input
+  const rawUsername = route.params?.username || 'Waqar';
+  const cleanUsername = rawUsername.includes('@') ? rawUsername.split('@')[0] : rawUsername;
+  const username = cleanUsername.charAt(0).toUpperCase() + cleanUsername.slice(1);
 
-  // Search input aur new task input local states
+  const { theme, toggleTheme, colors } = useAppTheme();
+  const { tasks, loading, addTask, deleteTask, toggleTaskCompleted } = useTasks();
+  const { data: flaskData, refetch: refetchFlask, isFetching: isFlaskLoading } = useFlaskStatus();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [newTitle, setNewTitle] = useState('');
 
-  const isDark = theme === 'dark'; // Check dark mode active
+  const isDark = theme === 'dark';
 
-  // Search filter query logic
   const filteredTasks = tasks.filter((t) =>
     t.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // New task addition validator
   const handleAddTask = () => {
     if (!newTitle.trim()) return;
     addTask(newTitle);
-    setNewTitle(''); // Input state clear
+    setNewTitle('');
   };
 
-  // Priority chip ke colors decide karne ka logic
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('logged_in_user');
+      navigation.replace('Login');
+    } catch (error) {
+      console.error('Failed to clear session:', error);
+    }
+  };
+
   const getPriorityStyle = (priority: 'LOW' | 'MEDIUM' | 'HIGH') => {
     switch (priority) {
       case 'HIGH':
@@ -63,22 +66,19 @@ export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   };
 
-  // Flask server status badge background picker
   const getFlaskBadgeColor = () => {
-    if (flaskData?.status === 'Standby') return '#E8A020'; // Standby yellow
-    return '#16A34A'; // Connected green
+    if (flaskData?.status === 'Standby') return '#E8A020';
+    return '#16A34A';
   };
 
-  // Individual task row item layout render helper
   const renderTaskItem = ({ item }: { item: Task }) => {
     const prio = getPriorityStyle(item.priority);
 
     return (
       <View style={[styles.taskCard, { backgroundColor: colors.surface, shadowColor: colors.shadow }]}>
         
-        {/* Left side: Checkbox + Title click to navigate to Details */}
+        {/* Left: Checkbox and Title */}
         <View style={styles.taskLeftSection}>
-          {/* Custom Checkbox toggle action */}
           <TouchableOpacity
             style={[styles.checkbox, { borderColor: colors.border }]}
             activeOpacity={0.7}
@@ -87,7 +87,6 @@ export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
             {item.completed && <Text style={styles.checkMark}>✓</Text>}
           </TouchableOpacity>
 
-          {/* Pressable task title container to open editor */}
           <TouchableOpacity
             style={styles.textClickable}
             activeOpacity={0.7}
@@ -106,19 +105,18 @@ export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Right side: Priority chip + Delete button */}
+        {/* Right: Priority and Delete */}
         <View style={styles.taskRightSection}>
           <View style={[styles.priorityBadge, { backgroundColor: prio.bg }]}>
             <Text style={[styles.priorityText, { color: prio.text }]}>{prio.label}</Text>
           </View>
 
-          {/* Delete trash button */}
           <TouchableOpacity
             style={styles.deleteBtn}
             activeOpacity={0.6}
             onPress={() => deleteTask(item.id)}
           >
-            <Text style={styles.deleteEmoji}>🗑️</Text>
+            <Text style={[styles.deleteText, { color: colors.textMuted }]}>Delete</Text>
           </TouchableOpacity>
         </View>
 
@@ -131,14 +129,14 @@ export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      {/* HEADER SECTION */}
+      {/* Header */}
       <View style={styles.headerRow}>
         <View>
-          <Text style={[styles.welcomeText, { color: colors.text }]}>Hello, {username}! 👋</Text>
+          <Text style={[styles.welcomeText, { color: colors.text }]}>Hello, {username}</Text>
           <Text style={[styles.subtitleText, { color: colors.textMuted }]}>Your tasks for today</Text>
         </View>
 
-        {/* Top Right Theme Toggler Switch */}
+        {/* Actions */}
         <View style={styles.headerRight}>
           <Switch
             value={isDark}
@@ -146,12 +144,18 @@ export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
             trackColor={{ false: '#CBD5E1', true: '#2563EB' }}
             thumbColor={isDark ? '#E8A020' : '#FFFFFF'}
           />
+          <TouchableOpacity
+            style={[styles.logoutBtn, { borderColor: colors.border }]}
+            onPress={handleLogout}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.logoutText, { color: colors.text }]}>Logout</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* SUB-HEADER ROW: Flask indicator + AI Coach badge button */}
+      {/* Sub-header */}
       <View style={styles.subHeaderRow}>
-        {/* Flask connection status badge (Pressable to retry network status) */}
         <TouchableOpacity
           style={[styles.flaskBadge, { borderColor: colors.border }]}
           activeOpacity={0.8}
@@ -170,19 +174,17 @@ export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
           )}
         </TouchableOpacity>
 
-        {/* Navigation button to AI Coach screen */}
         <TouchableOpacity
           style={styles.aiCoachBadge}
           activeOpacity={0.8}
           onPress={() => navigation.navigate('AICoach')}
         >
-          <Text style={styles.aiCoachText}>🤖 AI Coach</Text>
+          <Text style={styles.aiCoachText}>AI Coach</Text>
         </TouchableOpacity>
       </View>
 
-      {/* SEARCH TASKS INPUT BAR */}
+      {/* Search */}
       <View style={[styles.searchContainer, { backgroundColor: colors.surface }]}>
-        <Text style={styles.searchEmoji}>🔍</Text>
         <TextInput
           style={[styles.searchInput, { color: colors.text }]}
           placeholder="Search tasks..."
@@ -192,7 +194,7 @@ export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
         />
       </View>
 
-      {/* TASKS LIST AREA */}
+      {/* Tasks List */}
       {loading ? (
         <View style={styles.loaderArea}>
           <ActivityIndicator size="large" color="#2563EB" />
@@ -213,7 +215,7 @@ export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
         />
       )}
 
-      {/* ADD TASK BOTTOM CONTAINER */}
+      {/* Add Task */}
       <View style={[styles.addTaskCard, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
         <TextInput
           style={[styles.addTaskInput, { color: colors.text }]}
@@ -231,13 +233,11 @@ export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* BOTTOM BRANDING */}
       <Text style={[styles.brandingText, { color: colors.textMuted }]}>Manage your tasks smarter</Text>
     </KeyboardAvoidingView>
   );
 };
 
-// Styles configuration sheet
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
   welcomeText: {
     fontSize: 26,
@@ -308,10 +308,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 16,
     height: 48,
-  },
-  searchEmoji: {
-    fontSize: 16,
-    marginRight: 8,
   },
   searchInput: {
     flex: 1,
@@ -381,10 +377,17 @@ const styles = StyleSheet.create({
     fontSize: 9,
   },
   deleteBtn: {
-    padding: 2,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#EF4444',
+    backgroundColor: '#FEE2E2',
   },
-  deleteEmoji: {
-    fontSize: 16,
+  deleteText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#DC2626',
   },
   loaderArea: {
     flex: 1,
@@ -421,6 +424,18 @@ const styles = StyleSheet.create({
     ...Typography.button,
     color: '#FFFFFF',
     letterSpacing: 1,
+  },
+  logoutBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoutText: {
+    fontSize: 12,
+    fontWeight: '700',
   },
   brandingText: {
     ...Typography.caption,

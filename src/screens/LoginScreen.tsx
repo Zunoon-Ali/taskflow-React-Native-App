@@ -1,10 +1,4 @@
-// =============================================================================
-// FILE: src/screens/LoginScreen.tsx
-// -----------------------------------------------------------------------------
-// Yeh login page hai jahan credentials validate hote hain.
-// =============================================================================
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -12,60 +6,77 @@ import {
   TextInput,
   TouchableOpacity,
   Switch,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
 } from 'react-native';
-import { StackScreenProps } from '@react-navigation/stack'; // React Navigation type
-import { useAppTheme } from '../context/ThemeContext'; // Theme context custom hook
-import { RootStackParamList } from '../types'; // Navigation type map
-import { Typography } from '../styles'; // Typography tokens
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StackScreenProps } from '@react-navigation/stack';
+import { useAppTheme } from '../context/ThemeContext';
+import { RootStackParamList } from '../types';
+import { Typography } from '../styles';
 
-// Screen props typings setup
 type Props = StackScreenProps<RootStackParamList, 'Login'>;
 
 export const LoginScreen: React.FC<Props> = ({ navigation }) => {
-  const { theme, toggleTheme, colors } = useAppTheme(); // Get current active theme colors
-
-  // Login form state hook
+  const { theme, toggleTheme, colors } = useAppTheme();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errorText, setErrorText] = useState('');
 
-  // Form input validation aur navigation logic
-  const handleLogin = () => {
+  // Check saved session on mount
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const savedUser = await AsyncStorage.getItem('logged_in_user');
+        if (savedUser) {
+          navigation.replace('Home', { username: savedUser });
+        }
+      } catch (error) {
+        console.error('Failed to read logged_in_user:', error);
+      }
+    };
+    checkSession();
+  }, []);
+
+  // Form submit handler
+  const handleLogin = async () => {
     if (!username.trim()) {
-      setErrorText('Username/Email is required!');
+      setErrorText('Username/Email is required');
       return;
     }
     if (!password.trim()) {
-      setErrorText('Password is required!');
+      setErrorText('Password is required');
       return;
     }
     if (password.length < 4) {
-      setErrorText('Password must be at least 4 characters!');
+      setErrorText('Password must be at least 4 characters');
       return;
     }
 
-    setErrorText(''); // Error message clear
-    navigation.replace('Home', { username: username.trim() }); // Navigate to Home screen
+    setErrorText('');
+    try {
+      await AsyncStorage.setItem('logged_in_user', username.trim());
+    } catch (error) {
+      console.error('Failed to save session:', error);
+    }
+    navigation.replace('Home', { username: username.trim() });
   };
 
-  const isDark = theme === 'dark'; // Check dark mode active
+  const isDark = theme === 'dark';
 
   return (
-    // KeyboardAvoidingView: Keyboard open hone pe inputs adjust hone ke liye
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         
-        {/* Top theme toggler switch row */}
+        {/* Theme Toggler */}
         <View style={styles.themeRow}>
           <Text style={[styles.themeLabel, { color: colors.textMuted }]}>
-            {isDark ? '🌙 Dark Mode' : '☀️ Light Mode'}
+            {isDark ? 'Dark Theme' : 'Light Theme'}
           </Text>
           <Switch
             value={isDark}
@@ -75,23 +86,22 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
           />
         </View>
 
-        {/* Center brand logo header area */}
+        {/* Brand Logo Header */}
         <View style={styles.logoSection}>
-          <Text style={styles.logoEmoji}>🎓</Text>
           <Text style={[styles.brandTitle, { color: colors.text }]}>TaskFlow</Text>
           <Text style={[styles.brandSubtitle, { color: colors.textMuted }]}>
-            Student Task Manager App
+            Student Task Manager
           </Text>
         </View>
 
-        {/* Form Inputs card container */}
+        {/* Form Card */}
         <View style={[styles.formCard, { backgroundColor: colors.surface, shadowColor: colors.shadow }]}>
           <Text style={[styles.loginTitle, { color: colors.text }]}>Welcome Back</Text>
           <Text style={[styles.loginSubtitle, { color: colors.textMuted }]}>
             Login to organize your academic tasks
           </Text>
 
-          {/* Email / Username Input */}
+          {/* Username Input */}
           <Text style={[styles.fieldLabel, { color: colors.text }]}>Username / Email</Text>
           <TextInput
             style={[styles.input, { 
@@ -99,7 +109,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
               borderColor: colors.border,
               color: colors.text 
             }]}
-            placeholder="Enter your name or email"
+            placeholder="Enter your username or email"
             placeholderTextColor={isDark ? '#64748B' : '#94A3B8'}
             value={username}
             onChangeText={(txt) => {
@@ -111,27 +121,37 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
           {/* Password Input */}
           <Text style={[styles.fieldLabel, { color: colors.text }]}>Password</Text>
-          <TextInput
-            style={[styles.input, { 
-              backgroundColor: isDark ? '#0D1B3E' : '#F0F5FF', 
-              borderColor: colors.border,
-              color: colors.text 
-            }]}
-            placeholder="Enter password"
-            placeholderTextColor={isDark ? '#64748B' : '#94A3B8'}
-            secureTextEntry
-            value={password}
-            onChangeText={(txt) => {
-              setPassword(txt);
-              if (errorText) setErrorText('');
-            }}
-            autoCapitalize="none"
-          />
+          <View style={[styles.passwordContainer, { 
+            backgroundColor: isDark ? '#0D1B3E' : '#F0F5FF', 
+            borderColor: colors.border 
+          }]}>
+            <TextInput
+              style={[styles.passwordInput, { color: colors.text }]}
+              placeholder="Enter password"
+              placeholderTextColor={isDark ? '#64748B' : '#94A3B8'}
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={(txt) => {
+                setPassword(txt);
+                if (errorText) setErrorText('');
+              }}
+              autoCapitalize="none"
+            />
+            <TouchableOpacity 
+              style={styles.eyeBtn}
+              activeOpacity={0.7}
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <Text style={[styles.eyeText, { color: colors.textMuted }]}>
+                {showPassword ? 'Hide' : 'Show'}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-          {/* Validation error display label */}
+          {/* Validation Error */}
           {errorText ? <Text style={styles.errorLabel}>{errorText}</Text> : null}
 
-          {/* Submit/Login Button */}
+          {/* Submit Button */}
           <TouchableOpacity
             style={styles.loginBtn}
             activeOpacity={0.8}
@@ -139,9 +159,22 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
           >
             <Text style={styles.loginBtnText}>LOG IN</Text>
           </TouchableOpacity>
+
+          {/* Autofill Demo Button */}
+          <TouchableOpacity
+            style={[styles.autofillBtn, { borderColor: colors.border }]}
+            activeOpacity={0.8}
+            onPress={() => {
+              setUsername('student@taskflow.com');
+              setPassword('student123');
+              if (errorText) setErrorText('');
+            }}
+          >
+            <Text style={[styles.autofillBtnText, { color: colors.text }]}>Autofill Demo Credentials</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Footer brand branding */}
+        {/* Footer */}
         <Text style={[styles.footerText, { color: colors.textMuted }]}>
           SZABIST Karachi · BSCS - 6D · 2026
         </Text>
@@ -151,7 +184,6 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
   );
 };
 
-// StyleSheet definitions
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -175,10 +207,6 @@ const styles = StyleSheet.create({
   logoSection: {
     alignItems: 'center',
     marginBottom: 32,
-  },
-  logoEmoji: {
-    fontSize: 54,
-    marginBottom: 8,
   },
   brandTitle: {
     ...Typography.h1,
@@ -219,6 +247,42 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     ...Typography.body,
     marginBottom: 16,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 12,
+    marginBottom: 16,
+    paddingRight: 12,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    ...Typography.body,
+  },
+  eyeBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  eyeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  autofillBtn: {
+    borderWidth: 1.5,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 12,
+    borderStyle: 'dashed',
+  },
+  autofillBtnText: {
+    ...Typography.button,
+    fontSize: 13,
+    fontWeight: '600',
   },
   errorLabel: {
     color: '#DC2626',

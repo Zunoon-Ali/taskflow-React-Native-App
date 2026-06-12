@@ -1,9 +1,3 @@
-// =============================================================================
-// FILE: src/screens/TaskDetailsScreen.tsx
-// -----------------------------------------------------------------------------
-// Task ki details edit karne, priority set karne aur AI suggestion lene ka page.
-// =============================================================================
-
 import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
@@ -16,31 +10,29 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
-import { StackScreenProps } from '@react-navigation/stack'; // React Navigation routing
-import { useAppTheme } from '../context/ThemeContext'; // Light/dark mode themes
-import { useTasks } from '../hooks/useTasks'; // Tasks global state hook
-import { useAiDescription } from '../hooks/useAi'; // Flask AI hook for tasks description
-import { RootStackParamList, Task } from '../types'; // TypeScript interfaces
-import { Typography } from '../styles'; // Font typography definitions
+import { StackScreenProps } from '@react-navigation/stack';
+import { useAppTheme } from '../context/ThemeContext';
+import { useTasks } from '../hooks/useTasks';
+import { useAiDescription } from '../hooks/useAi';
+import { RootStackParamList, Task } from '../types';
+import { Typography } from '../styles';
 
-// Navigation props types setup
 type Props = StackScreenProps<RootStackParamList, 'TaskDetails'>;
 
 export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
-  const { taskId } = route.params; // Get taskId parameter passed from list
-  const { theme, toggleTheme, colors } = useAppTheme(); // Theme colors mapping
-  const { tasks, updateTask } = useTasks(); // Tasks update handler function
-  const { mutate: generateDesc, isPending: isAiLoading } = useAiDescription(); // TanStack Query AI hook
+  const { taskId } = route.params;
+  const { theme, toggleTheme, colors } = useAppTheme();
+  const { tasks, updateTask } = useTasks();
+  const { mutate: generateDesc, isPending: isAiLoading } = useAiDescription();
 
-  const isDark = theme === 'dark'; // Check dark mode active
+  const isDark = theme === 'dark';
 
-  // Local state hooks to edit task fields
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState<'LOW' | 'MEDIUM' | 'HIGH'>('MEDIUM');
   const [completed, setCompleted] = useState(false);
   const [aiSays, setAiSays] = useState('');
 
-  // Find task on load and populate fields
+  // Populate data on mount/update
   useEffect(() => {
     const task = tasks.find((t) => t.id === taskId);
     if (task) {
@@ -51,17 +43,15 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }, [taskId, tasks]);
 
-  // AI Description generate command handler
   const handleAiGenerate = () => {
     if (!title.trim()) return;
     generateDesc(title, {
       onSuccess: (description) => {
-        setAiSays(description); // AI response set in state
+        setAiSays(description);
       },
     });
   };
 
-  // State save changes and go back
   const handleSaveChanges = () => {
     updateTask(taskId, {
       title: title.trim(),
@@ -69,15 +59,14 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       completed,
       aiSuggestion: aiSays,
     });
-    navigation.goBack(); // Return to previous screen
+    navigation.goBack();
   };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       
-      {/* HEADER SECTION */}
+      {/* Header */}
       <View style={[styles.headerRow, { paddingTop: Platform.OS === 'ios' ? 50 : 20 }]}>
-        {/* Back navigation button */}
         <TouchableOpacity
           style={styles.backBtn}
           activeOpacity={0.7}
@@ -88,7 +77,6 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
         <Text style={[styles.headerTitle, { color: colors.text }]}>Task Details</Text>
 
-        {/* Theme switcher toggle */}
         <Switch
           value={isDark}
           onValueChange={toggleTheme}
@@ -99,18 +87,18 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         
-        {/* AI Coach top shortcut link button */}
+        {/* AI Coach Link */}
         <View style={styles.coachLinkRow}>
           <TouchableOpacity
             style={styles.coachBtn}
             activeOpacity={0.8}
             onPress={() => navigation.navigate('AICoach')}
           >
-            <Text style={styles.coachBtnText}>🤖 AI Coach</Text>
+            <Text style={styles.coachBtnText}>AI Coach</Text>
           </TouchableOpacity>
         </View>
 
-        {/* TASK TITLE TEXTFIELD */}
+        {/* Title input */}
         <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Task Title:</Text>
         <TextInput
           style={[styles.input, { 
@@ -125,10 +113,9 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           onChangeText={setTitle}
         />
 
-        {/* PRIORITY SELECTION BUTTON GROUP */}
+        {/* Priority buttons */}
         <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Priority:</Text>
         <View style={[styles.priorityGroup, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          {/* LOW Priority Option */}
           <TouchableOpacity
             style={[
               styles.prioOption,
@@ -142,7 +129,6 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             ]}>LOW</Text>
           </TouchableOpacity>
 
-          {/* MEDIUM Priority Option */}
           <TouchableOpacity
             style={[
               styles.prioOption,
@@ -157,7 +143,6 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             ]}>MEDIUM</Text>
           </TouchableOpacity>
 
-          {/* HIGH Priority Option */}
           <TouchableOpacity
             style={[
               styles.prioOption,
@@ -172,10 +157,9 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {/* STATUS TOGGLE BUTTON GROUP */}
+        {/* Status buttons */}
         <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Status:</Text>
         <View style={[styles.statusGroup, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          {/* Pending Button */}
           <TouchableOpacity
             style={[
               styles.statusOption,
@@ -188,7 +172,6 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             </Text>
           </TouchableOpacity>
 
-          {/* Complete Button */}
           <TouchableOpacity
             style={[
               styles.statusOption,
@@ -202,7 +185,7 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {/* GENERATE AI MOTIVATION/DESCRIPTION BUTTON */}
+        {/* Generate AI description */}
         <TouchableOpacity
           style={styles.generateBtn}
           activeOpacity={0.8}
@@ -212,19 +195,19 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           {isAiLoading ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
-            <Text style={styles.generateBtnText}>✨ Generate AI Description</Text>
+            <Text style={styles.generateBtnText}>Generate AI Description</Text>
           )}
         </TouchableOpacity>
 
-        {/* AI SAYS SUGGESTION DISPLAY CARD */}
+        {/* AI Suggestion output */}
         {aiSays ? (
           <View style={styles.aiSaysCard}>
-            <Text style={styles.aiSaysTitle}>🤖 AI Says:</Text>
+            <Text style={styles.aiSaysTitle}>AI Says:</Text>
             <Text style={styles.aiSaysContent}>{aiSays}</Text>
           </View>
         ) : null}
 
-        {/* SAVE CHANGES BUTTON */}
+        {/* Save button */}
         <TouchableOpacity
           style={styles.saveBtn}
           activeOpacity={0.8}
@@ -235,13 +218,11 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
       </ScrollView>
 
-      {/* FOOTER BRAND */}
       <Text style={[styles.footerText, { color: colors.textMuted }]}>Manage your tasks smarter</Text>
     </View>
   );
 };
 
-// Layout styling sheet
 const styles = StyleSheet.create({
   container: {
     flex: 1,
