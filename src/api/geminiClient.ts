@@ -1,6 +1,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GEMINI_API_KEY } from '@env';
 
+console.log('GEMINI KEY:', GEMINI_API_KEY);
+console.log('KEY LENGTH:', GEMINI_API_KEY?.length);
+
 // Get API key from env variables dynamically
 const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
 
@@ -21,9 +24,9 @@ export const getGeminiTaskDescription = async (title: string): Promise<string> =
     return responseText ? responseText.trim() : 'Focus on organizing this task into smaller steps and allocate dedicated study time.';
   } catch (error: any) {
     console.log('--- GEMINI API TASK DESCRIPTION ERROR ---');
-    console.log('STATUS:', error?.status);
-    console.log('MESSAGE:', error?.message);
-    console.log('FULL ERROR:', JSON.stringify(error, null, 2));
+    console.log('GEMINI KEY:', GEMINI_API_KEY);
+    console.log('ERROR OBJECT:', error);
+    console.log('ERROR RESPONSE:', JSON.stringify(error?.response, null, 2));
     console.warn('Gemini API Task Description generation failed (using fallback):', error);
     return 'Focus on organizing this task into smaller steps and allocate dedicated study time.';
   }
@@ -62,9 +65,9 @@ export const getGeminiCoachingAdvice = async (feeling: string): Promise<{ mood: 
     return getFallbackCoaching(feeling);
   } catch (error: any) {
     console.log('--- GEMINI API COACHING ERROR ---');
-    console.log('STATUS:', error?.status);
-    console.log('MESSAGE:', error?.message);
-    console.log('FULL ERROR:', JSON.stringify(error, null, 2));
+    console.log('GEMINI KEY:', GEMINI_API_KEY);
+    console.log('ERROR OBJECT:', error);
+    console.log('ERROR RESPONSE:', JSON.stringify(error?.response, null, 2));
     console.warn('Gemini API Coaching Advice generation failed (using fallback):', error);
     return getFallbackCoaching(feeling);
   }
