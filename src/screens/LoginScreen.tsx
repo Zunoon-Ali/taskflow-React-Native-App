@@ -10,6 +10,7 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackScreenProps } from '@react-navigation/stack';
 import { useAppTheme } from '../context/ThemeContext';
@@ -19,6 +20,7 @@ import { Typography } from '../styles';
 type Props = StackScreenProps<RootStackParamList, 'Login'>;
 
 export const LoginScreen: React.FC<Props> = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
   const { theme, toggleTheme, colors } = useAppTheme();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -71,7 +73,13 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         
         {/* Theme Toggler */}
         <View style={styles.themeRow}>

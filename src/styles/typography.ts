@@ -25,30 +25,30 @@ const Typography = StyleSheet.create({
 
   // Sab se bada heading — screen ki main title ke liye
   h1: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '800',   // '800' = Extra Bold — aik scale 100 se 900 tak hoti hai
-    lineHeight: 36,      // Line height = text ki "height" — letters ke upar neeche space
+    lineHeight: 40,      // Line height = text ki "height" — letters ke upar neeche space
   },
 
   // Thoda chhota heading — sections ke liye
   h2: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700',   // Bold
-    lineHeight: 30,
+    lineHeight: 32,
   },
 
   // Sub-section heading
   h3: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
-    lineHeight: 26,
+    lineHeight: 28,
   },
 
   // Card titles aur list items ke liye
   h4: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',   // Semi-bold
-    lineHeight: 22,
+    lineHeight: 24,
   },
 
   // -----------------------------------
@@ -57,16 +57,16 @@ const Typography = StyleSheet.create({
 
   // Main paragraph text
   body: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '400',   // Normal weight — nahi likha to bhi same hota hai
-    lineHeight: 22,
+    lineHeight: 24,
   },
 
   // Thoda chhota body text — secondary info ke liye
   bodySmall: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '400',
-    lineHeight: 18,
+    lineHeight: 20,
   },
 
   // -----------------------------------
@@ -75,14 +75,14 @@ const Typography = StyleSheet.create({
 
   // Button text — thoda medium weight
   button: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
-    lineHeight: 20,
+    lineHeight: 22,
   },
 
   // Labels, badges, tags — choti choti chips ke liye
   label: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.8,  // Letters ke beech thodi gap — professional lagta hai
     textTransform: 'uppercase' as const,
@@ -92,9 +92,9 @@ const Typography = StyleSheet.create({
 
   // Caption — images ke neeche ya footnotes mein chhota text
   caption: {
-    fontSize: 11,
-    fontWeight: '400',
-    lineHeight: 16,
+    fontSize: 12,
+    fontWeight: '500',
+    lineHeight: 18,
   },
 });
 

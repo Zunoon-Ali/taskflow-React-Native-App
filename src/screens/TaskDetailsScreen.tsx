@@ -10,6 +10,7 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StackScreenProps } from '@react-navigation/stack';
 import { useAppTheme } from '../context/ThemeContext';
 import { useTasks } from '../hooks/useTasks';
@@ -20,6 +21,7 @@ import { Typography } from '../styles';
 type Props = StackScreenProps<RootStackParamList, 'TaskDetails'>;
 
 export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
+  const insets = useSafeAreaInsets();
   const { taskId } = route.params;
   const { theme, toggleTheme, colors } = useAppTheme();
   const { tasks, updateTask } = useTasks();
@@ -66,7 +68,7 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       
       {/* Header */}
-      <View style={[styles.headerRow, { paddingTop: Platform.OS === 'ios' ? 50 : 20 }]}>
+      <View style={[styles.headerRow, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity
           style={styles.backBtn}
           activeOpacity={0.7}
@@ -85,7 +87,10 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 60 }]}
+        showsVerticalScrollIndicator={false}
+      >
         
         {/* AI Coach Link */}
         <View style={styles.coachLinkRow}>
@@ -218,7 +223,7 @@ export const TaskDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
       </ScrollView>
 
-      <Text style={[styles.footerText, { color: colors.textMuted }]}>Manage your tasks smarter</Text>
+      <Text style={[styles.footerText, { color: colors.textMuted, bottom: insets.bottom + 6 }]}>Manage your tasks smarter</Text>
     </View>
   );
 };
@@ -299,7 +304,7 @@ const styles = StyleSheet.create({
   },
   prioText: {
     ...Typography.button,
-    fontSize: 12,
+    fontSize: 14,
   },
   statusGroup: {
     flexDirection: 'row',
@@ -315,7 +320,7 @@ const styles = StyleSheet.create({
   },
   checkboxLabel: {
     ...Typography.button,
-    fontSize: 12,
+    fontSize: 14,
     color: '#64748B',
   },
   generateBtn: {
@@ -363,7 +368,7 @@ const styles = StyleSheet.create({
     ...Typography.caption,
     textAlign: 'center',
     position: 'absolute',
-    bottom: 6,
+    bottom: 6, // overridden per-render with insets
     left: 0,
     right: 0,
     fontWeight: '500',

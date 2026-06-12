@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackScreenProps } from '@react-navigation/stack';
 import { useAppTheme } from '../context/ThemeContext';
@@ -22,6 +23,7 @@ import { Typography } from '../styles';
 type Props = StackScreenProps<RootStackParamList, 'Home'>;
 
 export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
+  const insets = useSafeAreaInsets();
   // Extract clean username from email or input
   const rawUsername = route.params?.username || 'Waqar';
   const cleanUsername = rawUsername.includes('@') ? rawUsername.split('@')[0] : rawUsername;
@@ -127,7 +129,7 @@ export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}
     >
       {/* Header */}
       <View style={styles.headerRow}>
@@ -205,7 +207,7 @@ export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
           data={filteredTasks}
           keyExtractor={(item) => item.id}
           renderItem={renderTaskItem}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 145 }]}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyArea}>
@@ -216,7 +218,7 @@ export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
       )}
 
       {/* Add Task */}
-      <View style={[styles.addTaskCard, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
+      <View style={[styles.addTaskCard, { backgroundColor: colors.surface, borderTopColor: colors.border, bottom: insets.bottom + 36 }]}>
         <TextInput
           style={[styles.addTaskInput, { color: colors.text }]}
           placeholder="New task title..."
@@ -233,7 +235,7 @@ export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <Text style={[styles.brandingText, { color: colors.textMuted }]}>Manage your tasks smarter</Text>
+      <Text style={[styles.brandingText, { color: colors.textMuted, bottom: insets.bottom + 6 }]}>Manage your tasks smarter</Text>
     </KeyboardAvoidingView>
   );
 };
@@ -241,7 +243,6 @@ export const HomeScreen: React.FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Platform.OS === 'ios' ? 50 : 20,
   },
   headerRow: {
     flexDirection: 'row',
@@ -316,7 +317,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 20,
-    paddingBottom: 135,
+    paddingBottom: 135, // overridden per-render with insets
   },
   taskCard: {
     flexDirection: 'row',
@@ -374,7 +375,7 @@ const styles = StyleSheet.create({
   },
   priorityText: {
     ...Typography.label,
-    fontSize: 9,
+    fontSize: 11,
   },
   deleteBtn: {
     paddingVertical: 4,
@@ -385,7 +386,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEE2E2',
   },
   deleteText: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '700',
     color: '#DC2626',
   },
@@ -403,7 +404,7 @@ const styles = StyleSheet.create({
   },
   addTaskCard: {
     position: 'absolute',
-    bottom: 50,
+    bottom: 50, // overridden per-render with insets
     left: 20,
     right: 20,
     borderRadius: 20,
@@ -434,14 +435,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoutText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '700',
   },
   brandingText: {
     ...Typography.caption,
     textAlign: 'center',
     position: 'absolute',
-    bottom: 6,
+    bottom: 6, // overridden per-render with insets
     left: 0,
     right: 0,
     fontWeight: '500',

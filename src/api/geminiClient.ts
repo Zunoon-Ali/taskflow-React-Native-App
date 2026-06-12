@@ -10,7 +10,7 @@ const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
  */
 export const getGeminiTaskDescription = async (title: string): Promise<string> => {
   try {
-    const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const prompt = `As an academic assistant, write a short, highly professional, action-oriented task description (max 2-3 sentences) for a student task titled: "${title}". Do not use any introductory phrases, bullet points, or markdown styling.`;
     
     const result = await model.generateContent({
@@ -30,7 +30,7 @@ export const getGeminiTaskDescription = async (title: string): Promise<string> =
  */
 export const getGeminiCoachingAdvice = async (feeling: string): Promise<{ mood: string; advice: string }> => {
   try {
-    const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const prompt = `You are a professional academic coach for college students. Analyze this student's feeling: "${feeling}". 
     Provide your response strictly in the following JSON format:
     {
@@ -64,26 +64,76 @@ export const getGeminiCoachingAdvice = async (feeling: string): Promise<{ mood: 
 
 const getFallbackCoaching = (feeling: string): { mood: string; advice: string } => {
   const lowerFeeling = feeling.toLowerCase();
-  if (lowerFeeling.includes('exam') || lowerFeeling.includes('stress') || lowerFeeling.includes('anxious')) {
+
+  // Stressed — exam, tension, anxiety (Roman Urdu + English)
+  if (
+    lowerFeeling.includes('exam') ||
+    lowerFeeling.includes('stress') ||
+    lowerFeeling.includes('anxious') ||
+    lowerFeeling.includes('paper') ||
+    lowerFeeling.includes('test') ||
+    lowerFeeling.includes('fail') ||
+    lowerFeeling.includes('tension') ||
+    lowerFeeling.includes('pareshan') ||
+    lowerFeeling.includes('fikar') ||
+    lowerFeeling.includes('dar') ||
+    lowerFeeling.includes('mushkil') ||
+    lowerFeeling.includes('preparation') ||
+    lowerFeeling.includes('taiari') ||
+    lowerFeeling.includes('worried') ||
+    lowerFeeling.includes('confused')
+  ) {
     return {
       mood: 'Stressed',
-      advice: 'Take a deep breath. Start by listing the first key topic and tackle it step-by-step. Focus on one item at a time to reduce stress.'
+      advice: 'Take a deep breath. Start by listing the first key topic and tackle it step-by-step. Focus on one item at a time to reduce stress.',
     };
   }
-  if (lowerFeeling.includes('happy') || lowerFeeling.includes('good') || lowerFeeling.includes('excited')) {
+
+  // Happy — positive vibes (Roman Urdu + English)
+  if (
+    lowerFeeling.includes('happy') ||
+    lowerFeeling.includes('good') ||
+    lowerFeeling.includes('excited') ||
+    lowerFeeling.includes('khush') ||
+    lowerFeeling.includes('acha') ||
+    lowerFeeling.includes('mazah') ||
+    lowerFeeling.includes('easy') ||
+    lowerFeeling.includes('pass') ||
+    lowerFeeling.includes('sukoon') ||
+    lowerFeeling.includes('great') ||
+    lowerFeeling.includes('amazing') ||
+    lowerFeeling.includes('motivated')
+  ) {
     return {
       mood: 'Happy',
-      advice: 'Keep this positive momentum going and focus on finishing your high priority tasks today.'
+      advice: 'Keep this positive momentum going and focus on finishing your high priority tasks today!',
     };
   }
-  if (lowerFeeling.includes('lazy') || lowerFeeling.includes('tired') || lowerFeeling.includes('sleepy')) {
+
+  // Tired / Lazy — fatigue and low motivation (Roman Urdu + English)
+  if (
+    lowerFeeling.includes('lazy') ||
+    lowerFeeling.includes('tired') ||
+    lowerFeeling.includes('sleepy') ||
+    lowerFeeling.includes('susti') ||
+    lowerFeeling.includes('thak') ||
+    lowerFeeling.includes('thaka') ||
+    lowerFeeling.includes('neend') ||
+    lowerFeeling.includes('boring') ||
+    lowerFeeling.includes('dil nahi') ||
+    lowerFeeling.includes('man nahi') ||
+    lowerFeeling.includes('bored') ||
+    lowerFeeling.includes('exhausted')
+  ) {
     return {
       mood: 'Tired',
-      advice: 'Start with a simple 5-minute task. Once you begin, action builds momentum. Take short breaks as needed.'
+      advice: 'Start with a simple 5-minute task. Once you begin, action builds momentum. Take short breaks as needed.',
     };
   }
+
+  // Default neutral
   return {
     mood: 'Neutral',
-    advice: 'Organize your tasks by priority, tackle them step by step, and remember to take short breaks.'
+    advice: 'Organize your tasks by priority, tackle them step by step, and remember to take short breaks.',
   };
 };
