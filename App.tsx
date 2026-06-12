@@ -2,15 +2,23 @@
 // FILE: App.tsx
 // -----------------------------------------------------------------------------
 // App ki entrypoint file jahan routing (screen navigation stack) configure hoti hai.
+// IMPORTANT: react-native-gesture-handler MUST be the very first import.
 // =============================================================================
+
+// Must be first import — gesture-handler needs to be set up before navigation
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import React from 'react';
 import { StatusBar } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context'; // Safe area environment setup
-import { NavigationContainer } from '@react-navigation/native'; // React Navigation base wrapper
-import { createStackNavigator } from '@react-navigation/stack'; // Stack navigator generator function
-import AppProvider from './src/AppProvider'; // Combined theme, query, database providers
-import { RootStackParamList } from './src/types'; // Navigation type map
+import { enableScreens } from 'react-native-screens'; // Native screen optimization
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import AppProvider from './src/AppProvider';
+import { RootStackParamList } from './src/types';
+
+// Enable native screens before any navigation renders
+enableScreens();
 
 // Screens import
 import LoginScreen from './src/screens/LoginScreen';
@@ -23,36 +31,28 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 function App(): React.JSX.Element {
   return (
-    // SafeAreaProvider: notch aur home indicator spacing environment
-    <SafeAreaProvider>
-      {/* AppProvider: queryClient + theme + tasks context handlers */}
-      <AppProvider>
-        
-        {/* NavigationContainer: Navigation manager container */}
-        <NavigationContainer>
-          
-          {/* StatusBar setup (Status bar transparent aur dynamic text color ke liye) */}
-          <StatusBar barStyle="default" />
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <AppProvider>
+          <NavigationContainer>
+            <StatusBar barStyle="dark-content" backgroundColor="#F8FAFF" />
 
-          {/* Stack.Navigator: screen changing transitions controller */}
-          <Stack.Navigator
-            initialRouteName="Login" // App open hote hi pehle login page dikhega
-            screenOptions={{
-              headerShown: false, // Har screen pe custom header display kya hai isliye default hide
-              cardStyle: { backgroundColor: 'transparent' } // Background colors screens handle karengi
-            }}
-          >
-            {/* Navigational screens routing keys mapping */}
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="TaskDetails" component={TaskDetailsScreen} />
-            <Stack.Screen name="AICoach" component={AICoachScreen} />
-          </Stack.Navigator>
+            <Stack.Navigator
+              initialRouteName="Login"
+              screenOptions={{
+                headerShown: false,
+              }}
+            >
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="TaskDetails" component={TaskDetailsScreen} />
+              <Stack.Screen name="AICoach" component={AICoachScreen} />
+            </Stack.Navigator>
 
-        </NavigationContainer>
-
-      </AppProvider>
-    </SafeAreaProvider>
+          </NavigationContainer>
+        </AppProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 

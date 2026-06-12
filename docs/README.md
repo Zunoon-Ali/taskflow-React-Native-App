@@ -1,12 +1,12 @@
-# TaskFlow - Student Task Manager App
+# 📚 TaskFlow Project Documentation Index
 
-TaskFlow is a hybrid mobile application built with React Native CLI and TypeScript that helps students manage their academic workload and get real-time study motivation.
+Welcome to the official documentation directory for the **TaskFlow** mobile application. This directory holds step-by-step guides covering React Native setup, app flows, Gemini AI chatbot integration, and local storage state persistence.
 
 ---
 
-## 📚 Project Documentation
+## 🗂️ Documentation Guides
 
-Explore the detailed engineering guides created for your project:
+Select a guide below to explore technical implementation details:
 
 1. **[📱 React Native Setup & Prerequisites Guide](file:///f:/reactNative/docs/01_react_native_setup.md)**
    - Pre-initialization software requirements (Node.js, JDK 17, Android Studio SDKs & Build tools).
@@ -35,31 +35,4 @@ Explore the detailed engineering guides created for your project:
 
 ---
 
-## Quick Start
-
-### Step 1: Start Metro Dev Server
-Metro builds your JavaScript code. Keep it running in the background:
-```bash
-npm start
-```
-
-### Step 2: Run the App on Android (Emulator or Connected Mobile)
-Ensure an emulator is running, or your physical phone is connected with USB Debugging enabled, then execute:
-```bash
-npm run android
-```
-
-### Step 3: Troubleshooting Cache Errors
-If modules are not found or components do not refresh, clear your caches and reload:
-```bash
-# Clear metro cache
-npx react-native start --reset-cache
-
-# Clear Android compile cache
-cd android
-./gradlew clean
-cd ..
-```
-
----
 *SZABIST Karachi · BSCS - 6D · 2026*
